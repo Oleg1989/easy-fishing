@@ -1,0 +1,11 @@
+User: 
+    -id;
+    -name;
+    -email;
+    -password;
+    -markers: Marker[];
+
+Marker: 
+    -id;
+    -title;
+    -date;

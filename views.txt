@@ -1,0 +1,28 @@
+1. Login:
+    -input email;
+    -input password;
+    -button login;
+2. Registration: 
+    -input name;
+    -input email;
+    -input password;
+    -input password again;
+    -button registration;
+3. Main page: 
+    -navBar:
+        -search;
+        -button Sing in;
+        -button Sign up;
+    -map:
+        -geolocation;
+4. User page markers:
+    -navBar:
+        -search;
+        -button Add a location;
+        -button Sign out;
+    -map:
+        -geolocation;
+5. User page table:
+    -navBar:
+        -button Sign out;
+    -table;
