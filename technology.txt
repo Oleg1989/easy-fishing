@@ -1,0 +1,5 @@
+1. React
+2. Typescript
+3. Redux
+4. Tailwindcss
+5. Firebase
