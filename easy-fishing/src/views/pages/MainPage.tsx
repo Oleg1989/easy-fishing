@@ -1,0 +1,1 @@
+export const MainPage: React.FC = () => <h1>Main Page</h1>

@@ -1,0 +1,1 @@
+export const UserPageTable: React.FC = () => <h1>User page table</h1>
