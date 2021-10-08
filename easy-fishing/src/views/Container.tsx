@@ -20,28 +20,26 @@ export function Container() {
   // const dispatch = useAppDispatch();
 
   return (
-    <div className="md:container md:mx-auto">
-      <Router>
-        <div>
-          <Switch>
-            <Route path="/user/page/table">
-              <UserPageTable />
-            </Route>
-            <Route path="/user/page">
-              <UserPage />
-            </Route>
-            <Route path="/login">
-              <Login />
-            </Route>
-            <Route path="/registration">
-              <Registration />
-            </Route>
-            <Route path="/">
-              <MainPage />
-            </Route>
-          </Switch>
-        </div>
-      </Router >
-    </div>
+    <Router>
+      <div>
+        <Switch>
+          <Route path="/user/page/table">
+            <UserPageTable />
+          </Route>
+          <Route path="/user/page">
+            <UserPage />
+          </Route>
+          <Route path="/login">
+            <Login />
+          </Route>
+          <Route path="/registration">
+            <Registration />
+          </Route>
+          <Route path="/">
+            <MainPage />
+          </Route>
+        </Switch>
+      </div>
+    </Router >
   );
 }
