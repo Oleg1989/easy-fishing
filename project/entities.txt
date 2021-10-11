@@ -1,11 +1,23 @@
 User: 
-    -id;
-    -name;
-    -email;
-    -password;
-    -markers: Marker[];
+    -id: string;
+    -name string;
+    -email: string;
+    -password: string;
+    -locations: Location[];
 
-Marker: 
-    -id;
-    -title;
-    -date;
+Location: 
+    -id: string;
+    -coordinates: Coordinates;
+    -title: string;
+    -description: string;
+    -date: string;
+    -publicLocation: boolean;
+
+Coordinates:
+    -lat: number;
+    -lng: number;
+
+ContainerState: 
+    -isAuthenticated: boolean;
+    -locations: Location[];
+    -flagAddLocation: boolean;

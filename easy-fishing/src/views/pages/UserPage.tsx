@@ -3,11 +3,13 @@ import { Link } from "react-router-dom";
 import { Disclosure } from '@headlessui/react';
 import { MenuIcon, XIcon } from '@heroicons/react/outline';
 import { Map } from '../components/map/Map';
+import { turnOnAddLocation, activateSingOut } from '../containerSlice';
+import { useAppDispatch } from '../../app/hooks';
 
 const navigation = [
-    { name: 'Add marker', to: '#', current: false },
+    { name: 'Add a location', to: '#', current: false },
     { name: 'Table', to: '/user/page/table', current: false },
-    { name: 'Sign out', to: '/', current: false },
+    { name: 'Sign out', to: '#', current: false },
 ]
 
 function classNames(...classes: string[]) {
@@ -15,6 +17,14 @@ function classNames(...classes: string[]) {
 }
 
 export const UserPage: React.FC = () => {
+    const dispatch = useAppDispatch();
+
+    const addLocation = () => {
+        dispatch(turnOnAddLocation());
+    }
+    const singOut = () => {
+        dispatch(activateSingOut());
+    }
     return (
         <>
             <Disclosure as="nav" className="bg-gray-800">
@@ -56,6 +66,14 @@ export const UserPage: React.FC = () => {
                                                         <Link
                                                             key={item.name}
                                                             to={item.to}
+                                                            onClick={() => {
+                                                                if (item.name === 'Add a location') {
+                                                                    addLocation();
+                                                                }
+                                                                if (item.name === 'Sign out') {
+                                                                    singOut();
+                                                                }
+                                                            }}
                                                             className={classNames(
                                                                 item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                                                                 'px-3 py-2 rounded-md text-sm font-medium'
