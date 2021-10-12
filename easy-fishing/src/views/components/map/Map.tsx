@@ -5,11 +5,12 @@ import mapStyles from './mapStyles';
 import { Search } from './Search';
 import { Locate } from './Locate';
 import { Location } from '../../interface/InterfaceLocation';
+import { FormInputData } from '../../interface/InterfaceFormInputData';
 import { selectFlagAddLocation } from '../../containerSlice';
-
 import cuid from 'cuid';
 import { useAppSelector } from '../../../app/hooks';
 import { FormAddLocation } from '../forms/FormAddLocation';
+import { NewLocationMap } from '../../interface/InterfaceNewLocationMap';
 
 const containerStyle = {
     width: '100%',
@@ -48,34 +49,56 @@ export const Map: React.FC = () => {
         mapRef.current?.setZoom(15);
     }, []);
 
-    const [locations, setLocation] = useState<Location[]>([]);
+    const [locations, setLocations] = useState<Location[]>([]);
+    console.log(locations);
 
     const [selected, setSelected] = useState<Location | null>(null);
 
     const [showModal, setShowModal] = useState<boolean>(false);
 
+    const [formInputData, setFormInputData] = useState<FormInputData>({
+        title: '',
+        description: '',
+        date: new Date(),
+        publicLocation: false,
+    });
+    const [newLocation, setNewLocation] = useState<NewLocationMap | null>(null);
+
+    const addLocation = useCallback(() => {
+        if (!formInputData.title || !formInputData.description) {
+            return;
+        }
+        setLocations((current) => [
+            ...current,
+            {
+                id: newLocation!.id,
+                coordinates: newLocation!.coordinates,
+                title: formInputData.title,
+                description: formInputData.description,
+                date: formInputData.date.toLocaleString("en-US", {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    weekday: 'long',
+                }),
+                publicLocation: formInputData.publicLocation,
+            }
+        ]);
+
+    }, [formInputData, newLocation]);
+
     const onMapClick = useCallback((event) => {
         if (flagAddLocation) {
             setShowModal(true);
-            setLocation((current) => [
-                ...current,
+            setNewLocation(
                 {
                     id: cuid(),
                     coordinates: {
                         lat: event.latLng!.lat(),
                         lng: event.latLng!.lng(),
-                    },
-                    title: 'New market',
-                    description: 'Description string Description string Description string Description string Description string Description string Description string Description string Description string Description string Description string Description string',
-                    date: new Date().toLocaleString("en-US", {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        weekday: 'long',
-                    }),
-                    publicLocation: false,
+                    }
                 }
-            ]);
+            );
         }
         return;
     }, [flagAddLocation]);
@@ -91,6 +114,9 @@ export const Map: React.FC = () => {
             <FormAddLocation
                 showModal={showModal}
                 setShowModal={setShowModal}
+                formInputData={formInputData}
+                setFormInputData={setFormInputData}
+                addLocation={addLocation}
             />
 
             <GoogleMap
@@ -111,14 +137,9 @@ export const Map: React.FC = () => {
                         onClick={() => {
                             setSelected(location);
                         }}
-                    // icon={{
-                    //     url: '../../../img/av_64.png',
-                    //     scaledSize: new window.google.maps.Size(30, 30),
-                    //     origin: new window.google.maps.Point(0, 0),
-                    //     anchor: new window.google.maps.Point(15, 15)
-                    // }}
                     />
                 })}
+
                 {selected ? (<InfoWindow
                     position={{
                         lat: selected.coordinates.lat,
@@ -129,10 +150,6 @@ export const Map: React.FC = () => {
                     }
                     }
                 >
-                    {/* <div>
-                        <h1>{selected.title}</h1>
-                        <p>{selected.date}</p>
-                    </div> */}
                     <div className=" relative w-full bg-white rounded shadow-lg transitionOpacity transitionTransform duration-300">
                         <div className="px-4 py-3 border-b border-gray-200">
                             <h2 className="text-xl font-semibold text-gray-600">{selected.title}</h2>

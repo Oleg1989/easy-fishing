@@ -1,55 +1,132 @@
 import React from "react";
+import DatePicker from "react-datepicker";
+import { FormInputData } from '../../interface/InterfaceFormInputData';
+import { disableAddLocation } from '../../containerSlice'
+import "react-datepicker/dist/react-datepicker.css";
+import { useAppDispatch } from "../../../app/hooks";
 
-export const FormAddLocation = (props: { showModal: boolean, setShowModal: (showModal: boolean) => void }) => {
+export const FormAddLocation = (props: {
+    showModal: boolean,
+    setShowModal: (showModal: boolean) => void,
+    formInputData: FormInputData,
+    setFormInputData: (formData: FormInputData) => void,
+    addLocation: () => void,
+}) => {
+
+    const dispatch = useAppDispatch();
+
     return (
         <>
             {props.showModal ? (
                 <>
                     <div
-                        className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none"
+                        className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none m-5"
                     >
-                        <div className="relative w-auto my-6 mx-auto max-w-3xl">
+                        <div className="relative w-full my-6 mx-auto max-w-3xl">
                             {/*content*/}
                             <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
                                 {/*header*/}
                                 <div className="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
                                     <h3 className="text-3xl font-semibold">
-                                        Modal Title
+                                        New location
                                     </h3>
-                                    <button
-                                        className="p-1 ml-auto bg-transparent border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
-                                        onClick={() => props.setShowModal(false)}
-                                    >
-                                        <span className="bg-transparent text-black opacity-5 h-6 w-6 text-2xl block outline-none focus:outline-none">
-                                            ×
-                                        </span>
-                                    </button>
                                 </div>
                                 {/*body*/}
                                 <div className="relative p-6 flex-auto">
-                                    <p className="my-4 text-blueGray-500 text-lg leading-relaxed">
-                                        I always felt like I could do anything. That’s the main
-                                        thing people are controlled by! Thoughts- their perception
-                                        of themselves! They're slowed down by their perception of
-                                        themselves. If you're taught you can’t do anything, you
-                                        won’t do anything. I was taught I could do everything.
-                                    </p>
+                                    <div className="w-full py-5">
+                                        <label htmlFor="street-address" className="block text-sm font-medium text-gray-700">
+                                            Title
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="title"
+                                            defaultValue={''}
+                                            onChange={(event) => {
+                                                props.setFormInputData({
+                                                    ...props.formInputData,
+                                                    title: event.target.value
+                                                })
+                                            }}
+                                            className="mt-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                        />
+                                    </div>
+                                    <div className="w-full py-5">
+                                        <label htmlFor="about" className="block text-sm font-medium text-gray-700">
+                                            Description
+                                        </label>
+                                        <div className="mt-1">
+                                            <textarea
+                                                name="about"
+                                                rows={3}
+                                                className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-2 block w-full sm:text-sm border border-gray-300 rounded-md"
+                                                placeholder="Your description..."
+                                                defaultValue={''}
+                                                onChange={(event) => {
+                                                    props.setFormInputData({
+                                                        ...props.formInputData,
+                                                        description: event.target.value
+                                                    })
+                                                }}
+                                            />
+                                        </div>
+                                        <p className="mt-2 text-sm text-gray-500">
+                                            A brief description of your event.
+                                        </p>
+                                    </div>
+                                    <div className="w-full py-5">
+                                        <label htmlFor="about" className="block text-sm font-medium text-gray-700">
+                                            Public location?
+                                        </label>
+                                        <input
+                                            type="checkbox"
+                                            name="checkbox"
+                                            checked={false}
+                                            onChange={(event) => {
+                                                props.setFormInputData({
+                                                    ...props.formInputData,
+                                                    publicLocation: event.target.checked
+                                                })
+                                            }}
+                                            className="mt-2 block shadow-sm sm:text-sm border-gray-400"
+                                        />
+                                    </div>
+                                    <div className="w-full py-5">
+                                        <label htmlFor="about" className="block text-sm font-medium text-gray-700">
+                                            Date
+                                        </label>
+                                        <div className="mt-2">
+                                            <DatePicker
+                                                selected={props.formInputData.date}
+                                                onChange={(newDate: Date) => props.setFormInputData({
+                                                    ...props.formInputData!,
+                                                    date: newDate,
+                                                })}
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                                 {/*footer*/}
                                 <div className="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b">
                                     <button
                                         className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                                         type="button"
-                                        onClick={() => props.setShowModal(false)}
+                                        onClick={() => {
+                                            props.setShowModal(false);
+                                            dispatch(disableAddLocation());
+                                        }}
                                     >
                                         Close
                                     </button>
                                     <button
-                                        className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                                        className="bg-green-600 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                                         type="button"
-                                        onClick={() => props.setShowModal(false)}
+                                        onClick={(event) => {
+                                            props.setShowModal(false);
+                                            dispatch(disableAddLocation());
+                                            props.addLocation();
+                                        }}
                                     >
-                                        Save Changes
+                                        Save location
                                     </button>
                                 </div>
                             </div>

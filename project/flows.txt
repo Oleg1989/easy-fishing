@@ -3,5 +3,5 @@
 3. Add a marker to the map - you need to click on the map and fill out the input form.
 4. View markers on the map.
 5. View and edit all markers in the table.
-6. Search the map. //????
-7. Geolocation on the map. //???
+6. Search the location.
+7. Geolocation on the map.

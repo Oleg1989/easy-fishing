@@ -28,6 +28,9 @@ export const containerSlice = createSlice({
     turnOnAddLocation: (state) => {
       state.flagAddLocation = true;
     },
+    disableAddLocation: (state) => {
+      state.flagAddLocation = false;
+    },
     activateSingOut: (state) => {
       state.isAuthenticated = !state.isAuthenticated;
     }
@@ -46,7 +49,7 @@ export const containerSlice = createSlice({
   // },
 });
 
-export const { turnOnAddLocation, activateSingOut } = containerSlice.actions;
+export const { turnOnAddLocation, activateSingOut, disableAddLocation } = containerSlice.actions;
 
 export const selectPublicLocations = (state: RootState) => state.container.publicLocations;
 export const selectUserLocations = (state: RootState) => state.container.user?.locations;

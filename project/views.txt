@@ -24,5 +24,6 @@
         -geolocation;
 5. User page table:
     -navBar:
+        -button User page;
         -button Sign out;
     -table;
