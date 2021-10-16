@@ -1,7 +1,24 @@
+import React, { useState } from 'react';
 import { LockClosedIcon } from '@heroicons/react/solid';
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
+import { registrationUser } from '../containerSlice';
+import { useAppDispatch } from '../../app/hooks';
+import { UserApp } from '../interface/InterfaceUserApp';
 
 export const Registration: React.FC = () => {
+    const dispatch = useAppDispatch();
+
+    const [user, setUser] = useState<UserApp>({
+        name: '',
+        email: '',
+        password: '',
+        locations: [],
+    });
+
+    const handleRegistration = () => {
+        dispatch(registrationUser(user));
+    }
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full space-y-8">
@@ -35,6 +52,13 @@ export const Registration: React.FC = () => {
                                 type="text"
                                 autoComplete="name"
                                 required
+                                value={user.name}
+                                onChange={(event) => {
+                                    setUser({
+                                        ...user,
+                                        name: event.target.value,
+                                    });
+                                }}
                                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                                 placeholder="Your name"
                             />
@@ -49,6 +73,13 @@ export const Registration: React.FC = () => {
                                 type="email"
                                 autoComplete="email"
                                 required
+                                value={user.email}
+                                onChange={(event) => {
+                                    setUser({
+                                        ...user,
+                                        email: event.target.value,
+                                    });
+                                }}
                                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                                 placeholder="Email address"
                             />
@@ -63,11 +94,18 @@ export const Registration: React.FC = () => {
                                 type="password"
                                 autoComplete="current-password"
                                 required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                value={user.password}
+                                onChange={(event) => {
+                                    setUser({
+                                        ...user,
+                                        password: event.target.value,
+                                    });
+                                }}
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                                 placeholder="Password"
                             />
                         </div>
-                        <div>
+                        {/* <div>
                             <label htmlFor="password" className="sr-only">
                                 Repeat password
                             </label>
@@ -80,7 +118,7 @@ export const Registration: React.FC = () => {
                                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                                 placeholder="Repeat password"
                             />
-                        </div>
+                        </div> */}
                     </div>
 
                     <div className="flex items-center justify-between">
@@ -106,6 +144,7 @@ export const Registration: React.FC = () => {
                     <div>
                         <button
                             type="button"
+                            onClick={handleRegistration}
                             className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:bg-gray-700"
                         >
                             <span className="absolute left-0 inset-y-0 flex items-center pl-3">

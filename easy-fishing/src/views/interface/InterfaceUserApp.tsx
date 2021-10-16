@@ -1,7 +1,6 @@
 import { Location } from "./InterfaceLocation";
 
-export interface User {
-    id: string,
+export interface UserApp {
     name: string,
     email: string,
     password: string,

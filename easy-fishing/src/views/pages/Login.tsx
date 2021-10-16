@@ -1,7 +1,21 @@
+import React, { useState } from 'react';
 import { LockClosedIcon } from '@heroicons/react/solid';
 import { Link } from "react-router-dom";
+import { loginUser } from '../containerSlice';
+import { useAppDispatch } from '../../app/hooks';
 
 export const Login: React.FC = () => {
+    const dispatch = useAppDispatch();
+
+    const [user, setUser] = useState({
+        email: '',
+        password: ''
+    });
+
+    const handleLogin = () => {
+        dispatch(loginUser(user));
+    }
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full space-y-8">
@@ -35,6 +49,13 @@ export const Login: React.FC = () => {
                                 type="email"
                                 autoComplete="email"
                                 required
+                                value={user.email}
+                                onChange={(event) => {
+                                    setUser({
+                                        ...user,
+                                        email: event.target.value,
+                                    });
+                                }}
                                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                                 placeholder="Email address"
                             />
@@ -49,6 +70,13 @@ export const Login: React.FC = () => {
                                 type="password"
                                 autoComplete="current-password"
                                 required
+                                value={user.password}
+                                onChange={(event) => {
+                                    setUser({
+                                        ...user,
+                                        password: event.target.value,
+                                    });
+                                }}
                                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                                 placeholder="Password"
                             />
@@ -78,6 +106,7 @@ export const Login: React.FC = () => {
                     <div>
                         <button
                             type="button"
+                            onClick={handleLogin}
                             className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:bg-gray-700"
                         >
                             <span className="absolute left-0 inset-y-0 flex items-center pl-3">

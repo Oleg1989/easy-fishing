@@ -80,11 +80,10 @@ export const FormAddLocation = (props: {
                                         <input
                                             type="checkbox"
                                             name="checkbox"
-                                            checked={false}
-                                            onChange={(event) => {
+                                            onClick={(event) => {
                                                 props.setFormInputData({
                                                     ...props.formInputData,
-                                                    publicLocation: event.target.checked
+                                                    publicLocation: (event.target as HTMLInputElement).checked
                                                 })
                                             }}
                                             className="mt-2 block shadow-sm sm:text-sm border-gray-400"

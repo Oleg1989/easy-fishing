@@ -6,9 +6,9 @@ import { Search } from './Search';
 import { Locate } from './Locate';
 import { Location } from '../../interface/InterfaceLocation';
 import { FormInputData } from '../../interface/InterfaceFormInputData';
-import { selectFlagAddLocation } from '../../containerSlice';
+import { selectFlagAddLocation, selectUId, addLocathinDatabase } from '../../containerSlice';
 import cuid from 'cuid';
-import { useAppSelector } from '../../../app/hooks';
+import { useAppSelector, useAppDispatch } from '../../../app/hooks';
 import { FormAddLocation } from '../forms/FormAddLocation';
 import { NewLocationMap } from '../../interface/InterfaceNewLocationMap';
 
@@ -30,8 +30,10 @@ const options = {
 }
 
 export const Map: React.FC = () => {
+    const dispatch = useAppDispatch();
 
     const flagAddLocation = useAppSelector(selectFlagAddLocation);
+    const uId = useAppSelector(selectUId);
 
     const { isLoaded, loadError } = useJsApiLoader({
         id: 'google-map-script',
@@ -50,7 +52,6 @@ export const Map: React.FC = () => {
     }, []);
 
     const [locations, setLocations] = useState<Location[]>([]);
-    console.log(locations);
 
     const [selected, setSelected] = useState<Location | null>(null);
 
@@ -68,6 +69,7 @@ export const Map: React.FC = () => {
         if (!formInputData.title || !formInputData.description) {
             return;
         }
+
         setLocations((current) => [
             ...current,
             {
@@ -85,7 +87,32 @@ export const Map: React.FC = () => {
             }
         ]);
 
-    }, [formInputData, newLocation]);
+        dispatch(addLocathinDatabase(
+            {
+                location: {
+                    id: newLocation!.id,
+                    coordinates: newLocation!.coordinates,
+                    title: formInputData.title,
+                    description: formInputData.description,
+                    date: formInputData.date.toLocaleString("en-US", {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        weekday: 'long',
+                    }),
+                    publicLocation: formInputData.publicLocation,
+                },
+                uid: uId!,
+            }
+        ));
+        setFormInputData({
+            title: '',
+            description: '',
+            date: new Date(),
+            publicLocation: false,
+        });
+
+    }, [formInputData, newLocation, uId, dispatch]);
 
     const onMapClick = useCallback((event) => {
         if (flagAddLocation) {
@@ -131,8 +158,8 @@ export const Map: React.FC = () => {
                     return <Marker
                         key={location.id}
                         position={{
-                            lat: location.coordinates.lat,
-                            lng: location.coordinates.lng,
+                            lat: +location.coordinates.lat,
+                            lng: +location.coordinates.lng,
                         }}
                         onClick={() => {
                             setSelected(location);
@@ -142,8 +169,8 @@ export const Map: React.FC = () => {
 
                 {selected ? (<InfoWindow
                     position={{
-                        lat: selected.coordinates.lat,
-                        lng: selected.coordinates.lng,
+                        lat: +selected.coordinates.lat,
+                        lng: +selected.coordinates.lng,
                     }}
                     onCloseClick={() => {
                         setSelected(null);

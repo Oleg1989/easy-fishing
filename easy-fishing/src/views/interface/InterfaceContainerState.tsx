@@ -1,10 +1,15 @@
-import { User } from './InterfaceUser';
+import { UserApp } from './InterfaceUserApp';
 import { Location } from './InterfaceLocation';
 
 export interface ContainerState {
+    uId: string | null;
+    uIdStatus: string;
     isAuthenticated: boolean;
+    isAuthenticatedStatus: string;
     flagAddLocation: boolean;
-    user: User | null;
+    flagAddLocationStatus: string;
+    user: UserApp | null;
+    userStatus: string;
     publicLocations: Location[];
-    status: 'idle' | 'loading' | 'failed';
+    publicLocationsStatus: string;
 }
