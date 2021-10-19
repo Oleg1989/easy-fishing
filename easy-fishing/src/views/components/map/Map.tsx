@@ -6,7 +6,13 @@ import { Search } from './Search';
 import { Locate } from './Locate';
 import { Location } from '../../interface/InterfaceLocation';
 import { FormInputData } from '../../interface/InterfaceFormInputData';
-import { selectFlagAddLocation, selectUId, addLocathinDatabase } from '../../containerSlice';
+import {
+    selectFlagAddLocation,
+    selectUId,
+    addLocathinDatabase,
+    selectUserLocations,
+    selectPublicLocations
+} from '../../containerSlice';
 import cuid from 'cuid';
 import { useAppSelector, useAppDispatch } from '../../../app/hooks';
 import { FormAddLocation } from '../forms/FormAddLocation';
@@ -34,6 +40,14 @@ export const Map: React.FC = () => {
 
     const flagAddLocation = useAppSelector(selectFlagAddLocation);
     const uId = useAppSelector(selectUId);
+    const userLocations = useAppSelector(selectUserLocations);
+    const publicLocations = useAppSelector(selectPublicLocations);
+
+
+    let locations: Location[] = [];
+    for (let key in userLocations) {
+        locations.push(userLocations[key]);
+    }
 
     const { isLoaded, loadError } = useJsApiLoader({
         id: 'google-map-script',
@@ -51,7 +65,8 @@ export const Map: React.FC = () => {
         mapRef.current?.setZoom(15);
     }, []);
 
-    const [locations, setLocations] = useState<Location[]>([]);
+    //const [locations, setLocations] = useState<Location[]>([]);
+
 
     const [selected, setSelected] = useState<Location | null>(null);
 
@@ -70,22 +85,22 @@ export const Map: React.FC = () => {
             return;
         }
 
-        setLocations((current) => [
-            ...current,
-            {
-                id: newLocation!.id,
-                coordinates: newLocation!.coordinates,
-                title: formInputData.title,
-                description: formInputData.description,
-                date: formInputData.date.toLocaleString("en-US", {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    weekday: 'long',
-                }),
-                publicLocation: formInputData.publicLocation,
-            }
-        ]);
+        // setLocations((current) => [
+        //     ...current,
+        //     {
+        //         id: newLocation!.id,
+        //         coordinates: newLocation!.coordinates,
+        //         title: formInputData.title,
+        //         description: formInputData.description,
+        //         date: formInputData.date.toLocaleString("en-US", {
+        //             year: 'numeric',
+        //             month: 'long',
+        //             day: 'numeric',
+        //             weekday: 'long',
+        //         }),
+        //         publicLocation: formInputData.publicLocation,
+        //     }
+        // ]);
 
         dispatch(addLocathinDatabase(
             {
@@ -154,7 +169,18 @@ export const Map: React.FC = () => {
                 onClick={onMapClick}
                 onLoad={onMapLoad}
             >
-                {locations.map(location => {
+                {locations.length !== 0 ? locations.map(location => {
+                    return <Marker
+                        key={location.id}
+                        position={{
+                            lat: +location.coordinates.lat,
+                            lng: +location.coordinates.lng,
+                        }}
+                        onClick={() => {
+                            setSelected(location);
+                        }}
+                    />
+                }) : publicLocations.map(location => {
                     return <Marker
                         key={location.id}
                         position={{

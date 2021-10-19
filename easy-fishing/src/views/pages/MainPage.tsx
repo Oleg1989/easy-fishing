@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from "react-router-dom";
 import { Disclosure } from '@headlessui/react';
 import { MenuIcon, XIcon } from '@heroicons/react/outline';
 import { Map } from '../components/map/Map';
+import { getPublicLocations } from '../containerSlice';
+import { useAppDispatch } from '../../app/hooks';
 
 const navigation = [
     { name: 'Sign in', to: '/login', current: false },
@@ -14,7 +16,11 @@ function classNames(...classes: string[]) {
 }
 
 export const MainPage: React.FC = () => {
+    const dispatch = useAppDispatch();
 
+    useEffect(() => {
+        dispatch(getPublicLocations());
+    });
     return (
         <>
             <Disclosure as="nav" className="bg-gray-800">

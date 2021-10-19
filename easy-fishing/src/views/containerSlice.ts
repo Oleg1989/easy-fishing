@@ -6,7 +6,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword
 } from "firebase/auth";
-import { getDatabase, ref, set } from "firebase/database";
+import { getDatabase, ref, set, child, get } from "firebase/database";
 import { UserApp } from './interface/InterfaceUserApp';
 import { Location } from '../views/interface/InterfaceLocation';
 
@@ -17,14 +17,19 @@ const initialState: ContainerState = {
   isAuthenticatedStatus: 'Is not Authenticated',
   flagAddLocation: false,
   flagAddLocationStatus: 'Not activated',
-  user: null,
+  user: {
+    name: '',
+    email: '',
+    password: '',
+    locations: {},
+  },
   userStatus: 'No user',
   publicLocations: [],
   publicLocationsStatus: 'No locations',
 };
 
 export const loginUser = createAsyncThunk(
-  'container/registrationUser',
+  'container/loginUser',
   async (user: { email: string, password: string }) => {
     const auth = getAuth();
     let userToken: string | null = null;
@@ -48,7 +53,7 @@ export const loginUser = createAsyncThunk(
 );
 
 export const registrationUser = createAsyncThunk(
-  'container/loginUser',
+  'container/registrationUser',
   async (user: UserApp) => {
     const auth = getAuth();
     const db = getDatabase();
@@ -76,12 +81,65 @@ export const registrationUser = createAsyncThunk(
     return { token: userToken, id: uId };
   }
 );
+
 export const addLocathinDatabase = createAsyncThunk(
   'container/addLocathinDatabase',
   async (marker: { location: Location, uid: string }) => {
     const db = getDatabase();
+    // const auth = getAuth();
+
+    // const myUserId = auth.currentUser?.uid;
     await set(ref(db, '/users/' + marker.uid + '/locations/' + marker.location.id), marker.location);
     return marker;
+  }
+);
+
+export const getUserFromDatabase = createAsyncThunk(
+  'container/getUserFromDatabase',
+  async (uId: string) => {
+    const dbRef = ref(getDatabase());
+
+    let userData: UserApp | null = await get(child(dbRef, `users/${uId}`)).then((snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        return data;
+      } else {
+        console.log("No data available");
+      }
+    }).catch((error) => {
+      const errorMessage = error.message;
+      alert(errorMessage);
+    });
+    return userData;
+  }
+);
+
+export const getPublicLocations = createAsyncThunk(
+  'container/getPublicLocations',
+  async () => {
+    const dbRef = ref(getDatabase());
+
+    const locations: Location[] = [];
+    await get(child(dbRef, `users`)).then((snapshot) => {
+      if (snapshot.exists()) {
+        const users = snapshot.val();
+        for (let keyUser in users) {
+          if (users[keyUser].locations) {
+            for (let key in users[keyUser].locations) {
+              if (users[keyUser].locations[key].publicLocation) {
+                locations.push(users[keyUser].locations[key]);
+              }
+            }
+          }
+        }
+      } else {
+        console.log("No data available");
+      }
+    }).catch((error) => {
+      const errorMessage = error.message;
+      alert(errorMessage);
+    });
+    return locations;
   }
 );
 
@@ -97,17 +155,20 @@ export const containerSlice = createSlice({
       state.flagAddLocation = false;
       state.flagAddLocationStatus = 'Not activated';
     },
-    isAuthenticated: (state) => {
+    isAuthenticated: (state, action: PayloadAction<string>) => {
       state.isAuthenticated = true;
-      state.isAuthenticatedStatus = 'Is authenticated'
+      state.isAuthenticatedStatus = 'Is authenticated';
+      state.uIdStatus = 'User id added';
+      state.uId = action.payload;
     },
     isNotAuthenticated: (state) => {
       state.isAuthenticated = false;
-      state.isAuthenticatedStatus = 'Is not authenticated'
-    },
-    getUser: (state, action) => {
-      state.user = action.payload;
-      state.userStatus = 'User added';
+      state.isAuthenticatedStatus = 'Is not authenticated';
+      localStorage.removeItem('token');
+      state.uId = null;
+      state.uIdStatus = 'User id deleted';
+      state.user!.locations = {};
+      state.userStatus = 'Locations deleted';
     }
   },
   extraReducers: (builder) => {
@@ -121,8 +182,8 @@ export const containerSlice = createSlice({
           state.isAuthenticated = true;
           state.uIdStatus = 'User id added';
           state.uId = action.payload.id;
-          const token: string = JSON.stringify(action.payload.token);
-          localStorage.setItem('token', token);
+          localStorage.setItem('uId', action.payload.id!);
+          localStorage.setItem('token', action.payload.token!);
         }
       })
       .addCase(loginUser.pending, (state) => {
@@ -134,21 +195,46 @@ export const containerSlice = createSlice({
           state.isAuthenticated = true;
           state.uIdStatus = 'User id added';
           state.uId = action.payload.id;
-          const token: string = JSON.stringify(action.payload.token);
-          localStorage.setItem('token', token);
+          localStorage.setItem('uId', action.payload.id!);
+          localStorage.setItem('token', action.payload.token!);
         }
       })
       .addCase(addLocathinDatabase.pending, (state) => {
         state.userStatus = 'loading...';
       })
       .addCase(addLocathinDatabase.fulfilled, (state, action) => {
-        state.user = null;
-        state.userStatus = 'No user';
+        state.user!.locations = { ...state.user!.locations, [action.payload.location.id]: action.payload.location };
+        state.userStatus = 'Location added';
+      }
+      )
+      .addCase(getUserFromDatabase.pending, (state) => {
+        state.userStatus = 'loading...';
+      })
+      .addCase(getUserFromDatabase.fulfilled, (state, action) => {
+        state.user = {
+          ...state.user!,
+          name: action.payload?.name!,
+          email: action.payload?.email!,
+          locations: { ...action.payload?.locations! }
+        };
+        state.userStatus = 'User added';
+      })
+      .addCase(getPublicLocations.pending, (state) => {
+        state.publicLocationsStatus = 'loading...';
+      })
+      .addCase(getPublicLocations.fulfilled, (state, action) => {
+        state.publicLocations = [...action.payload];
+        state.publicLocationsStatus = 'Locations added';
       });
   },
 });
 
-export const { turnOnAddLocation, isAuthenticated, isNotAuthenticated, disableAddLocation, getUser } = containerSlice.actions;
+export const {
+  turnOnAddLocation,
+  isAuthenticated,
+  isNotAuthenticated,
+  disableAddLocation
+} = containerSlice.actions;
 
 export const selectPublicLocations = (state: RootState) => state.container.publicLocations;
 export const selectUserLocations = (state: RootState) => state.container.user?.locations;

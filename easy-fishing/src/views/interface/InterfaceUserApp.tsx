@@ -4,5 +4,5 @@ export interface UserApp {
     name: string,
     email: string,
     password: string,
-    locations: Location[],
+    locations: { [key: string]: Location },
 }

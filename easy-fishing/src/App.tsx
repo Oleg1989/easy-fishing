@@ -12,7 +12,7 @@ function App() {
   const dispatch = useAppDispatch();
 
   if (localStorage.getItem('token')) {
-    dispatch(isAuthenticated());
+    dispatch(isAuthenticated(localStorage.getItem('uId')!));
   }
 
   return (

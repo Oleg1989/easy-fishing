@@ -12,7 +12,7 @@ export const Registration: React.FC = () => {
         name: '',
         email: '',
         password: '',
-        locations: [],
+        locations: {},
     });
 
     const handleRegistration = () => {

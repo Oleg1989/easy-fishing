@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from "react-router-dom";
 import { Disclosure } from '@headlessui/react';
 import { MenuIcon, XIcon } from '@heroicons/react/outline';
 import { Map } from '../components/map/Map';
-import { turnOnAddLocation, isNotAuthenticated } from '../containerSlice';
-import { useAppDispatch } from '../../app/hooks';
+import { turnOnAddLocation, isNotAuthenticated, getUserFromDatabase, selectUId } from '../containerSlice';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
 
 const navigation = [
     { name: 'Add a location', to: '#', current: false },
@@ -17,15 +17,20 @@ function classNames(...classes: string[]) {
 }
 
 export const UserPage: React.FC = () => {
+
     const dispatch = useAppDispatch();
+    const uId = useAppSelector(selectUId);
 
     const addLocation = () => {
         dispatch(turnOnAddLocation());
     }
     const singOut = () => {
         dispatch(isNotAuthenticated());
-        localStorage.removeItem('token');
     }
+
+    useEffect(() => {
+        dispatch(getUserFromDatabase(uId!));
+    });
     return (
         <>
             <Disclosure as="nav" className="bg-gray-800">
