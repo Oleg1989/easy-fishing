@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { GoogleMap, InfoWindow, Marker, useJsApiLoader } from '@react-google-maps/api';
 import "@reach/combobox/styles.css";
 import mapStyles from './mapStyles';
@@ -17,22 +17,31 @@ import cuid from 'cuid';
 import { useAppSelector, useAppDispatch } from '../../../app/hooks';
 import { FormAddLocation } from '../forms/FormAddLocation';
 import { NewLocationMap } from '../../interface/InterfaceNewLocationMap';
+import { Coordinates } from '../../interface/InterfaceCoordinates';
 
 const containerStyle = {
     width: '100%',
     height: '91.5vh'
 };
-
-const center = {
-    lat: 49.2348249,
-    lng: 28.3995944,
-};
-
 const libraries: ["places"] = ["places"];
 
 
 const options = {
     styles: mapStyles,
+}
+
+let center: Coordinates;
+
+const userCenter = (): void => {
+
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            center = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+            };
+        }
+    )
 }
 
 export const Map: React.FC = () => {
@@ -42,7 +51,6 @@ export const Map: React.FC = () => {
     const uId = useAppSelector(selectUId);
     const userLocations = useAppSelector(selectUserLocations);
     const publicLocations = useAppSelector(selectPublicLocations);
-
 
     let locations: Location[] = [];
     for (let key in userLocations) {
@@ -145,6 +153,9 @@ export const Map: React.FC = () => {
         return;
     }, [flagAddLocation]);
 
+    useEffect(() => {
+        userCenter();
+    });
     if (loadError) return <h1>Error loading maps!</h1>;
     if (!isLoaded) return <h1>Loading maps</h1>;
 
@@ -217,6 +228,6 @@ export const Map: React.FC = () => {
                 </InfoWindow>) : null}
 
             </GoogleMap>
-        </div>
+        </div >
     )
 }
