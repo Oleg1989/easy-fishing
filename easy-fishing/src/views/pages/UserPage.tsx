@@ -20,7 +20,6 @@ export const UserPage: React.FC = () => {
 
     const dispatch = useAppDispatch();
     const uId = useAppSelector(selectUId);
-
     const addLocation = () => {
         dispatch(turnOnAddLocation());
     }
@@ -29,7 +28,7 @@ export const UserPage: React.FC = () => {
     }
 
     useEffect(() => {
-        dispatch(getUserFromDatabase(uId!));
+        dispatch(getUserFromDatabase(uId));
     });
     return (
         <>

@@ -8,7 +8,6 @@ import { Location } from '../../interface/InterfaceLocation';
 import { FormInputData } from '../../interface/InterfaceFormInputData';
 import {
     selectFlagAddLocation,
-    selectUId,
     addLocathinDatabase,
     selectUserLocations,
     selectPublicLocations
@@ -48,7 +47,6 @@ export const Map: React.FC = () => {
     const dispatch = useAppDispatch();
 
     const flagAddLocation = useAppSelector(selectFlagAddLocation);
-    const uId = useAppSelector(selectUId);
     const userLocations = useAppSelector(selectUserLocations);
     const publicLocations = useAppSelector(selectPublicLocations);
 
@@ -73,9 +71,6 @@ export const Map: React.FC = () => {
         mapRef.current?.setZoom(15);
     }, []);
 
-    //const [locations, setLocations] = useState<Location[]>([]);
-
-
     const [selected, setSelected] = useState<Location | null>(null);
 
     const [showModal, setShowModal] = useState<boolean>(false);
@@ -93,23 +88,6 @@ export const Map: React.FC = () => {
             return;
         }
 
-        // setLocations((current) => [
-        //     ...current,
-        //     {
-        //         id: newLocation!.id,
-        //         coordinates: newLocation!.coordinates,
-        //         title: formInputData.title,
-        //         description: formInputData.description,
-        //         date: formInputData.date.toLocaleString("en-US", {
-        //             year: 'numeric',
-        //             month: 'long',
-        //             day: 'numeric',
-        //             weekday: 'long',
-        //         }),
-        //         publicLocation: formInputData.publicLocation,
-        //     }
-        // ]);
-
         dispatch(addLocathinDatabase(
             {
                 location: {
@@ -124,8 +102,7 @@ export const Map: React.FC = () => {
                         weekday: 'long',
                     }),
                     publicLocation: formInputData.publicLocation,
-                },
-                uid: uId!,
+                }
             }
         ));
         setFormInputData({
@@ -135,7 +112,7 @@ export const Map: React.FC = () => {
             publicLocation: false,
         });
 
-    }, [formInputData, newLocation, uId, dispatch]);
+    }, [formInputData, newLocation, dispatch]);
 
     const onMapClick = useCallback((event) => {
         if (flagAddLocation) {

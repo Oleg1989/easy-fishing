@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ActionCreatorWithPayload, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../app/store';
 import { ContainerState } from './interface/InterfaceContainerState';
 import {
@@ -26,15 +26,24 @@ const initialState: ContainerState = {
   userStatus: 'No user',
   publicLocations: [],
   publicLocationsStatus: 'No locations',
+  showError: false,
+  showErrorStatus: 'No error',
+  errorMessage: '',
+  errorMessageStatus: 'No message',
 };
 
 export const loginUser = createAsyncThunk(
   'container/loginUser',
-  async (user: { email: string, password: string }) => {
+  async (
+    userApp: {
+      email: string,
+      password: string,
+      error: (message: string) => void,
+    }) => {
     const auth = getAuth();
     let userToken: string | null = null;
     let uId: string | null = null;
-    await signInWithEmailAndPassword(auth, user.email, user.password)
+    await signInWithEmailAndPassword(auth, userApp.email, userApp.password)
       .then(async (userCredential) => {
         const user = userCredential.user;
         uId = user.uid;
@@ -46,7 +55,7 @@ export const loginUser = createAsyncThunk(
       })
       .catch((error: Error) => {
         const errorMessage = error.message;
-        alert(errorMessage)
+        userApp.error(errorMessage);
       });
     return { token: userToken, id: uId };;
   }
@@ -54,12 +63,19 @@ export const loginUser = createAsyncThunk(
 
 export const registrationUser = createAsyncThunk(
   'container/registrationUser',
-  async (user: UserApp) => {
+  async (
+    userApp: {
+      name: string,
+      email: string,
+      password: string,
+      locations: {},
+      error: (message: string) => void,
+    }) => {
     const auth = getAuth();
     const db = getDatabase();
     let userToken: string | null = null;
     let uId: string | null = null;
-    await createUserWithEmailAndPassword(auth, user.email, user.password)
+    await createUserWithEmailAndPassword(auth, userApp.email, userApp.password)
       .then(async (userCredential) => {
         const user = userCredential.user;
         uId = user.uid;
@@ -68,36 +84,37 @@ export const registrationUser = createAsyncThunk(
             userToken = token;
           }
           )
+        await set(ref(db, 'users/' + uId), {
+          name: userApp.name,
+          email: user.email,
+          location: userApp.locations
+        });
       })
       .catch((error) => {
         const errorMessage = error.message;
-        alert(errorMessage)
+        userApp.error(errorMessage);
       });
-    await set(ref(db, 'users/' + uId), {
-      name: user.name,
-      email: user.email,
-      location: user.locations
-    });
     return { token: userToken, id: uId };
   }
 );
 
 export const addLocathinDatabase = createAsyncThunk(
   'container/addLocathinDatabase',
-  async (marker: { location: Location, uid: string }) => {
+  async (marker: { location: Location }) => {
     const db = getDatabase();
-    // const auth = getAuth();
+    const auth = getAuth();
 
-    // const myUserId = auth.currentUser?.uid;
-    await set(ref(db, '/users/' + marker.uid + '/locations/' + marker.location.id), marker.location);
+    const myUserId = auth.currentUser?.uid;
+    await set(ref(db, '/users/' + myUserId + '/locations/' + marker.location.id), marker.location);
     return marker;
   }
 );
 
 export const getUserFromDatabase = createAsyncThunk(
   'container/getUserFromDatabase',
-  async (uId: string) => {
-    const dbRef = ref(getDatabase());
+  async (uId: string | null) => {
+    const db = getDatabase();
+    const dbRef = ref(db);
 
     let userData: UserApp | null = await get(child(dbRef, `users/${uId}`)).then((snapshot) => {
       if (snapshot.exists()) {
@@ -169,6 +186,14 @@ export const containerSlice = createSlice({
       state.uIdStatus = 'User id deleted';
       state.user!.locations = {};
       state.userStatus = 'Locations deleted';
+    },
+    isError: (state) => {
+      state.showError = !state.showError;
+      state.showErrorStatus = 'Error';
+    },
+    isMessage: (state, action: PayloadAction<string>) => {
+      state.errorMessage = action.payload;
+      state.errorMessageStatus = 'Message';
     }
   },
   extraReducers: (builder) => {
@@ -217,6 +242,7 @@ export const containerSlice = createSlice({
           email: action.payload?.email!,
           locations: { ...action.payload?.locations! }
         };
+        state.publicLocations = [];
         state.userStatus = 'User added';
       })
       .addCase(getPublicLocations.pending, (state) => {
@@ -233,7 +259,9 @@ export const {
   turnOnAddLocation,
   isAuthenticated,
   isNotAuthenticated,
-  disableAddLocation
+  disableAddLocation,
+  isError,
+  isMessage
 } = containerSlice.actions;
 
 export const selectPublicLocations = (state: RootState) => state.container.publicLocations;
@@ -242,5 +270,7 @@ export const selectIsAuthenticated = (state: RootState) => state.container.isAut
 export const selectFlagAddLocation = (state: RootState) => state.container.flagAddLocation;
 export const selectUser = (state: RootState) => state.container.user;
 export const selectUId = (state: RootState) => state.container.uId;
+export const selectShowError = (state: RootState) => state.container.showError;
+export const selectErrorMessage = (state: RootState) => state.container.errorMessage;
 
 export default containerSlice.reducer;

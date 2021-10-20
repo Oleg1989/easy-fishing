@@ -12,4 +12,8 @@ export interface ContainerState {
     userStatus: string;
     publicLocations: Location[];
     publicLocationsStatus: string;
+    showError: boolean;
+    showErrorStatus: string;
+    errorMessage: string;
+    errorMessageStatus: string;
 }

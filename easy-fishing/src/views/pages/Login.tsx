@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
 import { LockClosedIcon } from '@heroicons/react/solid';
 import { Link } from "react-router-dom";
-import { loginUser } from '../containerSlice';
+import { isError, isMessage, loginUser } from '../containerSlice';
 import { useAppDispatch } from '../../app/hooks';
 
 export const Login: React.FC = () => {
     const dispatch = useAppDispatch();
 
+    const error = (message: string) => {
+        dispatch(isMessage(message));
+        dispatch(isError());
+    }
+
     const [user, setUser] = useState({
         email: '',
-        password: ''
+        password: '',
+        error: error
     });
 
     const handleLogin = () => {
@@ -29,12 +35,6 @@ export const Login: React.FC = () => {
                         </Link>
                     </div>
                     <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign in</h2>
-                    {/* <p className="mt-2 text-center text-sm text-gray-600">
-                        Or{' '}
-                        <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
-                            start your 14-day free trial
-                        </a>
-                    </p> */}
                 </div>
                 <form className="mt-8 space-y-6" action="#" method="POST">
                     <input type="hidden" name="remember" defaultValue="true" />
@@ -81,26 +81,6 @@ export const Login: React.FC = () => {
                                 placeholder="Password"
                             />
                         </div>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                        {/* <div className="flex items-center">
-                            <input
-                                id="remember-me"
-                                name="remember-me"
-                                type="checkbox"
-                                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                            />
-                            <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                                Remember me
-                            </label>
-                        </div> */}
-
-                        {/* <div className="text-sm">
-                            <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
-                                Forgot your password?
-                            </a>
-                        </div> */}
                     </div>
 
                     <div>
