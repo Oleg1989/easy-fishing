@@ -1,4 +1,4 @@
-import { ActionCreatorWithPayload, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../app/store';
 import { ContainerState } from './interface/InterfaceContainerState';
 import {
@@ -112,11 +112,11 @@ export const addLocathinDatabase = createAsyncThunk(
 
 export const getUserFromDatabase = createAsyncThunk(
   'container/getUserFromDatabase',
-  async (uId: string | null) => {
+  async (action: { uId: string | null, error: (message: string) => void }) => {
     const db = getDatabase();
     const dbRef = ref(db);
 
-    let userData: UserApp | null = await get(child(dbRef, `users/${uId}`)).then((snapshot) => {
+    let userData: UserApp | null = await get(child(dbRef, `users/${action.uId}`)).then((snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
         return data;
@@ -125,7 +125,7 @@ export const getUserFromDatabase = createAsyncThunk(
       }
     }).catch((error) => {
       const errorMessage = error.message;
-      alert(errorMessage);
+      action.error(errorMessage);
     });
     return userData;
   }
@@ -133,29 +133,30 @@ export const getUserFromDatabase = createAsyncThunk(
 
 export const getPublicLocations = createAsyncThunk(
   'container/getPublicLocations',
-  async () => {
+  async (error: (message: string) => void) => {
     const dbRef = ref(getDatabase());
 
     const locations: Location[] = [];
-    await get(child(dbRef, `users`)).then((snapshot) => {
-      if (snapshot.exists()) {
-        const users = snapshot.val();
-        for (let keyUser in users) {
-          if (users[keyUser].locations) {
-            for (let key in users[keyUser].locations) {
-              if (users[keyUser].locations[key].publicLocation) {
-                locations.push(users[keyUser].locations[key]);
+    await get(child(dbRef, `users`))
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          const users = snapshot.val();
+          for (let keyUser in users) {
+            if (users[keyUser].locations) {
+              for (let key in users[keyUser].locations) {
+                if (users[keyUser].locations[key].publicLocation) {
+                  locations.push(users[keyUser].locations[key]);
+                }
               }
             }
           }
+        } else {
+          console.log("No data available");
         }
-      } else {
-        console.log("No data available");
-      }
-    }).catch((error) => {
-      const errorMessage = error.message;
-      alert(errorMessage);
-    });
+      }).catch((error) => {
+        const errorMessage = error.message;
+        error(errorMessage);
+      });
     return locations;
   }
 );

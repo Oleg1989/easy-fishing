@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Disclosure } from '@headlessui/react';
 import { MenuIcon, XIcon } from '@heroicons/react/outline';
 import { Map } from '../components/map/Map';
-import { getPublicLocations } from '../containerSlice';
+import { getPublicLocations, isError, isMessage } from '../containerSlice';
 import { useAppDispatch } from '../../app/hooks';
 
 const navigation = [
@@ -18,8 +18,13 @@ function classNames(...classes: string[]) {
 export const MainPage: React.FC = () => {
     const dispatch = useAppDispatch();
 
+    const error = (message: string) => {
+        dispatch(isMessage(message));
+        dispatch(isError());
+    }
+
     useEffect(() => {
-        dispatch(getPublicLocations());
+        dispatch(getPublicLocations(error));
     });
     return (
         <>

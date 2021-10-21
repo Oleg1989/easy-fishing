@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Disclosure } from '@headlessui/react';
 import { MenuIcon, XIcon } from '@heroicons/react/outline';
 import { Map } from '../components/map/Map';
-import { turnOnAddLocation, isNotAuthenticated, getUserFromDatabase, selectUId } from '../containerSlice';
+import { turnOnAddLocation, isNotAuthenticated, getUserFromDatabase, selectUId, isMessage, isError } from '../containerSlice';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 
 const navigation = [
@@ -17,9 +17,14 @@ function classNames(...classes: string[]) {
 }
 
 export const UserPage: React.FC = () => {
-
     const dispatch = useAppDispatch();
     const uId = useAppSelector(selectUId);
+
+    const error = (message: string) => {
+        dispatch(isMessage(message));
+        dispatch(isError());
+    }
+
     const addLocation = () => {
         dispatch(turnOnAddLocation());
     }
@@ -28,7 +33,7 @@ export const UserPage: React.FC = () => {
     }
 
     useEffect(() => {
-        dispatch(getUserFromDatabase(uId));
+        dispatch(getUserFromDatabase({ uId: uId, error: error }));
     });
     return (
         <>
