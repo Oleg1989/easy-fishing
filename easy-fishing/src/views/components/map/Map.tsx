@@ -10,7 +10,8 @@ import {
     selectFlagAddLocation,
     addLocathinDatabase,
     selectUserLocations,
-    selectPublicLocations
+    selectPublicLocations,
+    selectUId
 } from '../../containerSlice';
 import cuid from 'cuid';
 import { useAppSelector, useAppDispatch } from '../../../app/hooks';
@@ -49,6 +50,7 @@ export const Map: React.FC = () => {
     const flagAddLocation = useAppSelector(selectFlagAddLocation);
     const userLocations = useAppSelector(selectUserLocations);
     const publicLocations = useAppSelector(selectPublicLocations);
+    const uId = useAppSelector(selectUId);
 
     let locations: Location[] = [];
     for (let key in userLocations) {
@@ -102,7 +104,8 @@ export const Map: React.FC = () => {
                         weekday: 'long',
                     }),
                     publicLocation: formInputData.publicLocation,
-                }
+                },
+                uId: uId!,
             }
         ));
         setFormInputData({
@@ -112,7 +115,7 @@ export const Map: React.FC = () => {
             publicLocation: false,
         });
 
-    }, [formInputData, newLocation, dispatch]);
+    }, [formInputData, newLocation, dispatch, uId]);
 
     const onMapClick = useCallback((event) => {
         if (flagAddLocation) {

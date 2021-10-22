@@ -6,7 +6,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword
 } from "firebase/auth";
-import { getDatabase, ref, set, child, get } from "firebase/database";
+import { getDatabase, ref, set, child, get, remove } from "firebase/database";
 import { UserApp } from './interface/InterfaceUserApp';
 import { Location } from '../views/interface/InterfaceLocation';
 
@@ -100,12 +100,10 @@ export const registrationUser = createAsyncThunk(
 
 export const addLocathinDatabase = createAsyncThunk(
   'container/addLocathinDatabase',
-  async (marker: { location: Location }) => {
+  async (marker: { location: Location, uId: string }) => {
     const db = getDatabase();
-    const auth = getAuth();
 
-    const myUserId = auth.currentUser?.uid;
-    await set(ref(db, '/users/' + myUserId + '/locations/' + marker.location.id), marker.location);
+    await set(ref(db, '/users/' + marker.uId + '/locations/' + marker.location.id), marker.location);
     return marker;
   }
 );
@@ -161,6 +159,21 @@ export const getPublicLocations = createAsyncThunk(
   }
 );
 
+export const deleteLocathinDatabase = createAsyncThunk(
+  'container/deleteLocathinDatabase',
+  async (id: { userId: string, locationId: string, error: (message: string) => void }) => {
+    const db = getDatabase();
+
+    await remove(ref(db, '/users/' + id.userId + '/locations/' + id.locationId))
+      .catch((error: Error) => {
+        const errorMessage = error.message;
+        id.error(errorMessage);
+      });
+
+    return id.locationId;
+  }
+);
+
 export const containerSlice = createSlice({
   name: 'container',
   initialState,
@@ -184,6 +197,7 @@ export const containerSlice = createSlice({
       state.isAuthenticatedStatus = 'Is not authenticated';
       localStorage.removeItem('token');
       state.uId = null;
+      localStorage.removeItem('uId');
       state.uIdStatus = 'User id deleted';
       state.user!.locations = {};
       state.userStatus = 'Locations deleted';
@@ -252,6 +266,17 @@ export const containerSlice = createSlice({
       .addCase(getPublicLocations.fulfilled, (state, action) => {
         state.publicLocations = [...action.payload];
         state.publicLocationsStatus = 'Locations added';
+      })
+      .addCase(deleteLocathinDatabase.pending, (state) => {
+        state.userStatus = 'loading...';
+      })
+      .addCase(deleteLocathinDatabase.fulfilled, (state, action) => {
+        for (let key in state.user?.locations) {
+          if (key === action.payload) {
+            delete state.user?.locations[key];
+          }
+        }
+        state.userStatus = 'Delete user location';
       });
   },
 });
