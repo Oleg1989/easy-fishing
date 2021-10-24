@@ -2,17 +2,18 @@ import { Disclosure } from '@headlessui/react';
 import { MenuIcon, XIcon } from '@heroicons/react/outline';
 import { Link } from "react-router-dom";
 import {
-    getUserFromDatabase,
     isError,
     isMessage,
     selectUId,
     selectUserLocations,
-    deleteLocathinDatabase,
-    selectUser
+    selectUser,
+    showModal
 } from '../containerSlice';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Location } from '../interface/InterfaceLocation';
+import { FormUpdateLocation } from '../components/forms/FormUpdateLocation';
+import { deleteLocathinDatabase, getUserFromDatabase } from '../containerAPI';
 
 
 const navigation = [
@@ -29,6 +30,8 @@ export const UserPageTable: React.FC = () => {
     const uId = useAppSelector(selectUId);
     const user = useAppSelector(selectUser);
 
+    const [updateLocationUser, setUpdateLocationUser] = useState<Location>();
+
     const error = (message: string) => {
         dispatch(isMessage(message));
         dispatch(isError());
@@ -44,6 +47,12 @@ export const UserPageTable: React.FC = () => {
         dispatch(deleteLocathinDatabase({ userId: uId!, locationId: id, error: error }));
     }
 
+    const updateLocation = (id: string) => {
+        dispatch(showModal())
+        const location = locations.find((loc) => loc.id === id);
+        setUpdateLocationUser(location);
+    }
+
     useEffect(() => {
         if (user?.name === '') {
             dispatch(getUserFromDatabase({ uId: uId, error: error }));
@@ -51,6 +60,10 @@ export const UserPageTable: React.FC = () => {
     });
     return (
         <>
+            <FormUpdateLocation
+                updateLocationUser={updateLocationUser!}
+                setUpdateLocationUser={setUpdateLocationUser}
+            />
             <Disclosure as="nav" className="bg-gray-800">
                 {({ open }) => (
                     <>
@@ -129,25 +142,25 @@ export const UserPageTable: React.FC = () => {
                                         <tr>
                                             <th
                                                 scope="col"
-                                                className="px-6 py-3 text-center text-xl font-medium text-gray-500 uppercase tracking-wider"
+                                                className="px-6 py-3 text-left text-xl font-medium text-gray-500 uppercase tracking-wider"
                                             >
                                                 Date
                                             </th>
                                             <th
                                                 scope="col"
-                                                className="px-6 py-3 text-center text-xl font-medium text-gray-500 uppercase tracking-wider"
+                                                className="px-6 py-3 text-left text-xl font-medium text-gray-500 uppercase tracking-wider"
                                             >
                                                 Title
                                             </th>
                                             <th
                                                 scope="col"
-                                                className="px-6 py-3 text-center text-xl font-medium text-gray-500 uppercase tracking-wider"
+                                                className="px-6 py-3 text-left text-xl font-medium text-gray-500 uppercase tracking-wider"
                                             >
                                                 Description
                                             </th>
                                             <th
                                                 scope="col"
-                                                className="px-6 py-3 text-center text-xl font-medium text-gray-500 uppercase tracking-wider"
+                                                className="px-6 py-3 text-left text-xl font-medium text-gray-500 uppercase tracking-wider"
                                             >
                                                 Status
                                             </th>
@@ -176,7 +189,12 @@ export const UserPageTable: React.FC = () => {
                                                     <div className="text-sm text-gray-900">{location.publicLocation === true ? 'Publicly' : 'Private'}</div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                    <button className="text-indigo-600 hover:text-indigo-900 m-5">
+                                                    <button
+                                                        className="text-indigo-600 hover:text-indigo-900 m-5"
+                                                        onClick={(event) => {
+                                                            updateLocation((event.target as HTMLElement).parentElement?.parentElement?.id!);
+                                                        }}
+                                                    >
                                                         Edit
                                                     </button>
                                                     <button

@@ -3,7 +3,7 @@ import compass from '../../../compass.svg';
 
 export const Locate = (panTo: InterfaceSearchProps) => {
     return (
-        <div className="absolute top-2 right-16 z-10">
+        <div className="absolute top-2 right-16 z-10" title="Geolocation">
             <button onClick={() => {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {

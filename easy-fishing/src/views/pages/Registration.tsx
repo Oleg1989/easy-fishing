@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { LockClosedIcon } from '@heroicons/react/solid';
 import { Link } from 'react-router-dom';
-import { isError, isMessage, registrationUser } from '../containerSlice';
+import { isError, isMessage } from '../containerSlice';
+import { registrationUser } from '../containerAPI';
 import { useAppDispatch } from '../../app/hooks';
 
 export const Registration: React.FC = () => {

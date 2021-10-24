@@ -3,8 +3,9 @@ import { Link } from "react-router-dom";
 import { Disclosure } from '@headlessui/react';
 import { MenuIcon, XIcon } from '@heroicons/react/outline';
 import { Map } from '../components/map/Map';
-import { getPublicLocations, isError, isMessage } from '../containerSlice';
+import { isError, isMessage } from '../containerSlice';
 import { useAppDispatch } from '../../app/hooks';
+import { getPublicLocations } from '../containerAPI';
 
 const navigation = [
     { name: 'Sign in', to: '/login', current: false },

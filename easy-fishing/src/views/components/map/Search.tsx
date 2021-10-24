@@ -30,7 +30,7 @@ export const Search = (panTo: InterfaceSearchProps) => {
     });
 
     return (
-        <div className="flex justify-center items-center z-10 absolute top-28 left-3">
+        <div className="flex justify-center items-center z-10 absolute top-32 left-3 shadow" title="Search">
             <div className="relative">
                 <Combobox onSelect={async (address) => {
                     setValue(address, false);

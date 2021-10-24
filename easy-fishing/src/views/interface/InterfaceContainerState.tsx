@@ -16,4 +16,6 @@ export interface ContainerState {
     showErrorStatus: string;
     errorMessage: string;
     errorMessageStatus: string;
+    modalUpdate: boolean,
+    modalUpdateStatus: string,
 }

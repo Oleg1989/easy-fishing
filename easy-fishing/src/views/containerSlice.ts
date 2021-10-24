@@ -1,14 +1,7 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RootState, AppThunk } from '../app/store';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { RootState } from '../app/store';
 import { ContainerState } from './interface/InterfaceContainerState';
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword
-} from "firebase/auth";
-import { getDatabase, ref, set, child, get, remove } from "firebase/database";
-import { UserApp } from './interface/InterfaceUserApp';
-import { Location } from '../views/interface/InterfaceLocation';
+import { addLocathinDatabase, deleteLocathinDatabase, getPublicLocations, getUserFromDatabase, loginUser, registrationUser, updateLocathinDatabase } from './containerAPI';
 
 const initialState: ContainerState = {
   uId: null,
@@ -30,149 +23,9 @@ const initialState: ContainerState = {
   showErrorStatus: 'No error',
   errorMessage: '',
   errorMessageStatus: 'No message',
+  modalUpdate: false,
+  modalUpdateStatus: 'Closed modal window',
 };
-
-export const loginUser = createAsyncThunk(
-  'container/loginUser',
-  async (
-    userApp: {
-      email: string,
-      password: string,
-      error: (message: string) => void,
-    }) => {
-    const auth = getAuth();
-    let userToken: string | null = null;
-    let uId: string | null = null;
-    await signInWithEmailAndPassword(auth, userApp.email, userApp.password)
-      .then(async (userCredential) => {
-        const user = userCredential.user;
-        uId = user.uid;
-        await user.getIdToken()
-          .then((token) => {
-            userToken = token;
-          }
-          )
-      })
-      .catch((error: Error) => {
-        const errorMessage = error.message;
-        userApp.error(errorMessage);
-      });
-    return { token: userToken, id: uId };;
-  }
-);
-
-export const registrationUser = createAsyncThunk(
-  'container/registrationUser',
-  async (
-    userApp: {
-      name: string,
-      email: string,
-      password: string,
-      locations: {},
-      error: (message: string) => void,
-    }) => {
-    const auth = getAuth();
-    const db = getDatabase();
-    let userToken: string | null = null;
-    let uId: string | null = null;
-    await createUserWithEmailAndPassword(auth, userApp.email, userApp.password)
-      .then(async (userCredential) => {
-        const user = userCredential.user;
-        uId = user.uid;
-        await user.getIdToken()
-          .then((token) => {
-            userToken = token;
-          }
-          )
-        await set(ref(db, 'users/' + uId), {
-          name: userApp.name,
-          email: user.email,
-          location: userApp.locations
-        });
-      })
-      .catch((error) => {
-        const errorMessage = error.message;
-        userApp.error(errorMessage);
-      });
-    return { token: userToken, id: uId };
-  }
-);
-
-export const addLocathinDatabase = createAsyncThunk(
-  'container/addLocathinDatabase',
-  async (marker: { location: Location, uId: string }) => {
-    const db = getDatabase();
-
-    await set(ref(db, '/users/' + marker.uId + '/locations/' + marker.location.id), marker.location);
-    return marker;
-  }
-);
-
-export const getUserFromDatabase = createAsyncThunk(
-  'container/getUserFromDatabase',
-  async (action: { uId: string | null, error: (message: string) => void }) => {
-    const db = getDatabase();
-    const dbRef = ref(db);
-
-    let userData: UserApp | null = await get(child(dbRef, `users/${action.uId}`)).then((snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        return data;
-      } else {
-        console.log("No data available");
-      }
-    }).catch((error) => {
-      const errorMessage = error.message;
-      action.error(errorMessage);
-    });
-    return userData;
-  }
-);
-
-export const getPublicLocations = createAsyncThunk(
-  'container/getPublicLocations',
-  async (error: (message: string) => void) => {
-    const dbRef = ref(getDatabase());
-
-    const locations: Location[] = [];
-    await get(child(dbRef, `users`))
-      .then((snapshot) => {
-        if (snapshot.exists()) {
-          const users = snapshot.val();
-          for (let keyUser in users) {
-            if (users[keyUser].locations) {
-              for (let key in users[keyUser].locations) {
-                if (users[keyUser].locations[key].publicLocation) {
-                  locations.push(users[keyUser].locations[key]);
-                }
-              }
-            }
-          }
-        } else {
-          console.log("No data available");
-        }
-      }).catch((error) => {
-        const errorMessage = error.message;
-        error(errorMessage);
-      });
-    return locations;
-  }
-);
-
-export const deleteLocathinDatabase = createAsyncThunk(
-  'container/deleteLocathinDatabase',
-  async (id: { userId: string, locationId: string, error: (message: string) => void }) => {
-    const db = getDatabase();
-
-    await remove(ref(db, '/users/' + id.userId + '/locations/' + id.locationId))
-      .catch((error: Error) => {
-        const errorMessage = error.message;
-        id.error(errorMessage);
-      });
-
-    return id.locationId;
-  }
-);
 
 export const containerSlice = createSlice({
   name: 'container',
@@ -209,6 +62,14 @@ export const containerSlice = createSlice({
     isMessage: (state, action: PayloadAction<string>) => {
       state.errorMessage = action.payload;
       state.errorMessageStatus = 'Message';
+    },
+    showModal: (state) => {
+      state.modalUpdate = true;
+      state.modalUpdateStatus = 'Oped modal window';
+    },
+    closeModal: (state) => {
+      state.modalUpdate = false;
+      state.modalUpdateStatus = 'Closed modal window';
     }
   },
   extraReducers: (builder) => {
@@ -264,7 +125,9 @@ export const containerSlice = createSlice({
         state.publicLocationsStatus = 'loading...';
       })
       .addCase(getPublicLocations.fulfilled, (state, action) => {
+        console.log(action.payload);
         state.publicLocations = [...action.payload];
+        console.log(state.publicLocations);
         state.publicLocationsStatus = 'Locations added';
       })
       .addCase(deleteLocathinDatabase.pending, (state) => {
@@ -274,6 +137,17 @@ export const containerSlice = createSlice({
         for (let key in state.user?.locations) {
           if (key === action.payload) {
             delete state.user?.locations[key];
+          }
+        }
+        state.userStatus = 'Delete user location';
+      })
+      .addCase(updateLocathinDatabase.pending, (state) => {
+        state.userStatus = 'loading...';
+      })
+      .addCase(updateLocathinDatabase.fulfilled, (state, action) => {
+        for (let key in state.user?.locations) {
+          if (key === action.payload.location.id) {
+            state.user!.locations[key] = { ...action.payload.location };
           }
         }
         state.userStatus = 'Delete user location';
@@ -287,7 +161,9 @@ export const {
   isNotAuthenticated,
   disableAddLocation,
   isError,
-  isMessage
+  isMessage,
+  showModal,
+  closeModal
 } = containerSlice.actions;
 
 export const selectPublicLocations = (state: RootState) => state.container.publicLocations;
@@ -298,5 +174,6 @@ export const selectUser = (state: RootState) => state.container.user;
 export const selectUId = (state: RootState) => state.container.uId;
 export const selectShowError = (state: RootState) => state.container.showError;
 export const selectErrorMessage = (state: RootState) => state.container.errorMessage;
+export const selectModalUpdate = (state: RootState) => state.container.modalUpdate;
 
 export default containerSlice.reducer;

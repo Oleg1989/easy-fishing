@@ -12,10 +12,8 @@ export function Container() {
 
   return (
     <Router>
-      <div className="container">
-        {routes}
-        <Error />
-      </div>
+      {routes}
+      <Error />
     </Router >
   );
 }

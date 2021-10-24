@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { Disclosure } from '@headlessui/react';
 import { MenuIcon, XIcon } from '@heroicons/react/outline';
 import { Map } from '../components/map/Map';
-import { turnOnAddLocation, isNotAuthenticated, getUserFromDatabase, selectUId, isMessage, isError } from '../containerSlice';
+import { turnOnAddLocation, isNotAuthenticated, selectUId, isMessage, isError } from '../containerSlice';
+import { getUserFromDatabase } from '../containerAPI';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 
 const navigation = [
