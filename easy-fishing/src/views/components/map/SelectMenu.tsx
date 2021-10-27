@@ -3,6 +3,8 @@ import { Fragment, useState } from 'react';
 import { Listbox, Transition } from '@headlessui/react';
 import { CheckIcon, SelectorIcon } from '@heroicons/react/solid';
 import mapStyles from './mapStyles';
+import { changeMapStyle } from '../../containerSlice';
+import { useAppDispatch } from '../../../app/hooks';
 
 const styles = [
     {
@@ -28,30 +30,27 @@ function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
 }
 
-export const SelectMenu = (
-    props: {
-        //Attention needs to change type any
-        setOptions: (style: { styles: any | null }) => void
-    }) => {
+export const SelectMenu = () => {
+    const dispatch = useAppDispatch();
     const [selected, setSelected] = useState(styles[0]);
 
     const newStyleMap = (style: string) => {
         switch (style) {
             case 'Blue Essence':
-                props.setOptions({ styles: mapStyles['Blue Essence'] });
                 localStorage.setItem('mapStyle', JSON.stringify(mapStyles['Blue Essence']));
+                dispatch(changeMapStyle({ newStyle: mapStyles['Blue Essence'], name: 'Blue Essence' }));
                 break;
             case 'Map Clean':
-                props.setOptions({ styles: mapStyles['Map Clean'] });
                 localStorage.setItem('mapStyle', JSON.stringify(mapStyles['Map Clean']));
+                dispatch(changeMapStyle({ newStyle: mapStyles['Map Clean'], name: 'Map Clean' }));
                 break;
             case 'Color Byte':
-                props.setOptions({ styles: mapStyles['Color Byte'] });
                 localStorage.setItem('mapStyle', JSON.stringify(mapStyles['Color Byte']));
+                dispatch(changeMapStyle({ newStyle: mapStyles['Color Byte'], name: 'Color Byte' }));
                 break;
             default:
-                props.setOptions({ styles: [] });
                 localStorage.setItem('mapStyle', JSON.stringify([]));
+                dispatch(changeMapStyle({ newStyle: [], name: 'Default' }));
         }
     }
 
@@ -60,9 +59,9 @@ export const SelectMenu = (
             value={selected}
             onChange={setSelected}
         >
-            <div className="z-10 absolute top-16 right-2" title="Map styles">
+            <div className="mr-5 ml-3" title="Map styles">
                 <Listbox.Button
-                    className="relative w-max bg-white shadow pl-0.5 pr-10 py-2 text-left cursor-pointer focus:outline-none focus:ring-1 focus:ring-indigo-300 sm:text-sm"
+                    className="relative w-auto bg-white shadow pl-0.5 pr-10 py-2 text-left cursor-pointer focus:outline-none focus:ring-1 focus:ring-indigo-300 sm:text-sm"
                 >
                     <span className="flex items-center">
                         <span className="ml-3 block truncate">{selected.name}</span>
@@ -74,7 +73,7 @@ export const SelectMenu = (
 
                 <Transition as={Fragment} leave="transition ease-in duration-100" leaveFrom="opacity-100" leaveTo="opacity-0">
                     <Listbox.Options
-                        className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-56 py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
+                        className="absolute z-10 mt-1 w-auto bg-white shadow-lg max-h-56 py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
                         onClick={(event: React.MouseEvent<HTMLElement>) => {
                             newStyleMap((event.target as HTMLElement).textContent!);
                         }}

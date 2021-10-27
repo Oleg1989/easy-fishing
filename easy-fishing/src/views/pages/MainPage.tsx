@@ -6,6 +6,7 @@ import { Map } from '../components/map/Map';
 import { isError, isMessage } from '../containerSlice';
 import { useAppDispatch } from '../../app/hooks';
 import { getPublicLocations } from '../containerAPI';
+import { SelectMenu } from '../components/map/SelectMenu';
 
 const navigation = [
     { name: 'Sign in', to: '/login', current: false },
@@ -52,25 +53,22 @@ export const MainPage: React.FC = () => {
                                             <span className="hidden md:block h-8 w-auto text-white text-3xl ml-20">Easy-Fishing</span>
                                         </div>
                                     </div>
-                                    <div className="hidden sm:block sm:ml-6">
-                                        <div className="flex sm:block sm:ml-6 flex-auto">
-                                            <div className="flex flex-auto justify-between space-x-4">
-                                                <div className="flex flex-wrap content-center justify-end">
-                                                    {navigation.map((item) => (
-                                                        <Link
-                                                            key={item.name}
-                                                            to={item.to}
-                                                            className={classNames(
-                                                                item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                                                                'px-3 py-2 rounded-md text-sm font-medium'
-                                                            )}
-                                                            aria-current={item.current ? 'page' : undefined}
-                                                        >
-                                                            {item.name}
-                                                        </Link>
-                                                    ))}
-                                                </div>
-                                            </div>
+                                    <div className="flex-1 hidden sm:block sm:ml-6">
+                                        <div className="flex flex-wrap content-center justify-end">
+                                            <SelectMenu />
+                                            {navigation.map((item) => (
+                                                <Link
+                                                    key={item.name}
+                                                    to={item.to}
+                                                    className={classNames(
+                                                        item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                                                        'px-3 py-2 rounded-md text-sm font-medium'
+                                                    )}
+                                                    aria-current={item.current ? 'page' : undefined}
+                                                >
+                                                    {item.name}
+                                                </Link>
+                                            ))}
                                         </div>
                                     </div>
                                 </div>
@@ -79,6 +77,7 @@ export const MainPage: React.FC = () => {
 
                         <Disclosure.Panel className="sm:hidden">
                             <div className="px-2 pt-2 pb-3 space-y-1">
+                                <SelectMenu />
                                 {navigation.map((item) => (
                                     <Link
                                         key={item.name}

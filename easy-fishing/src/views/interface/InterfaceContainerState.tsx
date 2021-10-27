@@ -18,4 +18,6 @@ export interface ContainerState {
     errorMessageStatus: string;
     modalUpdate: boolean,
     modalUpdateStatus: string,
+    mapStyle: [] | null,
+    mapStyleStatus: string,
 }

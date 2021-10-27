@@ -25,6 +25,8 @@ const initialState: ContainerState = {
   errorMessageStatus: 'No message',
   modalUpdate: false,
   modalUpdateStatus: 'Closed modal window',
+  mapStyle: JSON.parse(localStorage.getItem('mapStyle')!),
+  mapStyleStatus: 'Default',
 };
 
 export const containerSlice = createSlice({
@@ -70,6 +72,11 @@ export const containerSlice = createSlice({
     closeModal: (state) => {
       state.modalUpdate = false;
       state.modalUpdateStatus = 'Closed modal window';
+    },
+    //Attention needs to change type any
+    changeMapStyle: (state, action: PayloadAction<{ newStyle: any, name: string }>) => {
+      state.mapStyle = action.payload.newStyle;
+      state.mapStyleStatus = action.payload.name;
     }
   },
   extraReducers: (builder) => {
@@ -125,9 +132,7 @@ export const containerSlice = createSlice({
         state.publicLocationsStatus = 'loading...';
       })
       .addCase(getPublicLocations.fulfilled, (state, action) => {
-        console.log(action.payload);
         state.publicLocations = [...action.payload];
-        console.log(state.publicLocations);
         state.publicLocationsStatus = 'Locations added';
       })
       .addCase(deleteLocathinDatabase.pending, (state) => {
@@ -163,7 +168,8 @@ export const {
   isError,
   isMessage,
   showModal,
-  closeModal
+  closeModal,
+  changeMapStyle
 } = containerSlice.actions;
 
 export const selectPublicLocations = (state: RootState) => state.container.publicLocations;
@@ -175,5 +181,6 @@ export const selectUId = (state: RootState) => state.container.uId;
 export const selectShowError = (state: RootState) => state.container.showError;
 export const selectErrorMessage = (state: RootState) => state.container.errorMessage;
 export const selectModalUpdate = (state: RootState) => state.container.modalUpdate;
+export const selectMapStyle = (state: RootState) => state.container.mapStyle;
 
 export default containerSlice.reducer;

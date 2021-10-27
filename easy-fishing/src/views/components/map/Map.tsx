@@ -12,7 +12,8 @@ import {
     selectIsAuthenticated,
     showModal,
     isMessage,
-    isError
+    isError,
+    selectMapStyle
 } from '../../containerSlice';
 import cuid from 'cuid';
 import { useAppSelector, useAppDispatch } from '../../../app/hooks';
@@ -21,19 +22,15 @@ import { NewLocationMap } from '../../interface/InterfaceNewLocationMap';
 import { Coordinates } from '../../interface/InterfaceCoordinates';
 import { FormUpdateLocation } from '../forms/FormUpdateLocation';
 import { addLocathinDatabase, deleteLocathinDatabase } from '../../containerAPI';
-import { SelectMenu } from './SelectMenu';
 import "@reach/combobox/styles.css";
 
 //Google map settings
 const containerStyle = {
     width: '100%',
-    height: '91.5vh'
+    height: '91vh'
 
 };
 const libraries: ["places"] = ["places"];
-// let options: { styles: [] | null } = {
-//     styles: null,
-// }
 let center: Coordinates;
 const userCenter = (): void => {
 
@@ -56,6 +53,7 @@ export const Map: React.FC = () => {
     const publicLocations = useAppSelector(selectPublicLocations);
     const uId = useAppSelector(selectUId);
     const isAuthenticated = useAppSelector(selectIsAuthenticated);
+    const options = useAppSelector(selectMapStyle);
 
     const [selected, setSelected] = useState<Location | null>(null);
     const [showModalAddLocation, setShowModalAddLocation] = useState<boolean>(false);
@@ -67,7 +65,7 @@ export const Map: React.FC = () => {
     });
     const [newLocation, setNewLocation] = useState<NewLocationMap | null>(null);
     const [updateLocationUser, setUpdateLocationUser] = useState<Location>();
-    const [options, setOptions] = useState<{ styles: any | null }>({ styles: JSON.parse(localStorage.getItem('mapStyle')!) });
+    const [search, setSearch] = useState<boolean>(false);
 
     const error = (message: string) => {
         dispatch(isMessage(message));
@@ -154,10 +152,21 @@ export const Map: React.FC = () => {
 
     return (
         <div className="relative">
-
-            <Search panTo={panTo} />
+            <div
+                className="w-5 absolute  top-14 right-7 z-10 cursor-pointer"
+                title="Search"
+                onClick={() => {
+                    setSearch(true);
+                }}
+            >
+                <i className="fa fa-search text-blue-900 hover:text-gray-500 ">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </i>
+            </div>
+            {search ? <Search panTo={panTo} setSearch={setSearch} /> : null}
             <Locate panTo={panTo} />
-            <SelectMenu setOptions={setOptions} />
             <FormAddLocation
                 showModal={showModalAddLocation}
                 setShowModal={setShowModalAddLocation}
@@ -174,7 +183,7 @@ export const Map: React.FC = () => {
                 mapContainerStyle={containerStyle}
                 center={center}
                 zoom={10}
-                options={options}
+                options={{ styles: options }}
                 onClick={onMapClick}
                 onLoad={onMapLoad}
             >
@@ -212,7 +221,7 @@ export const Map: React.FC = () => {
                     }
                     }
                 >
-                    <div id={selected.id} className=" relative w-full bg-white rounded shadow-lg transitionOpacity transitionTransform duration-300">
+                    <div id={selected.id} className=" relative w-full bg-white rounded shadow-lg transitionOpacity transitionTransform duration-300 z-20">
                         <div className="px-4 py-3 border-b border-gray-200">
                             <h2 className="text-xl font-semibold text-gray-600">{selected.title}</h2>
                         </div>
@@ -229,7 +238,7 @@ export const Map: React.FC = () => {
                         <div>
                             {isAuthenticated ? <>
                                 <button
-                                    className="text-indigo-600 hover:text-indigo-900 m-5"
+                                    className="text-indigo-600 hover:text-indigo-900 m-3"
                                     onClick={(event) => {
                                         updateLocation((event.target as HTMLElement).parentElement?.parentElement?.id!);
                                         setSelected(null);
@@ -238,7 +247,7 @@ export const Map: React.FC = () => {
                                     Edit
                                 </button>
                                 <button
-                                    className="text-red-600 hover:text-red-900 m-5"
+                                    className="text-red-600 hover:text-red-900 m-3"
                                     onClick={(event) => {
                                         deleteLocation((event.target as HTMLElement).parentElement?.parentElement?.id!);
                                         setSelected(null);
@@ -247,7 +256,7 @@ export const Map: React.FC = () => {
                                     Delete
                                 </button>
                                 <button
-                                    className="text-yellow-600 hover:text-yellow-900 m-5"
+                                    className="text-yellow-600 hover:text-yellow-900 m-3"
                                     onClick={() => {
                                         setSelected(null);
                                     }}
