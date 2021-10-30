@@ -6,6 +6,7 @@ import { Map } from '../components/map/Map';
 import { turnOnAddLocation, isNotAuthenticated, selectUId, isMessage, isError } from '../containerSlice';
 import { getUserFromDatabase } from '../containerAPI';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { SelectMenu } from '../components/map/SelectMenu';
 
 const navigation = [
     { name: 'Add a location', to: '#', current: false },
@@ -41,7 +42,7 @@ export const UserPage: React.FC = () => {
             <Disclosure as="nav" className="bg-gray-800">
                 {({ open }) => (
                     <>
-                        <div className="max-w-7xl mx-auto">
+                        <div className="max-w-full mx-auto">
                             <div className="relative flex items-center justify-between h-16">
                                 <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
                                     {/* Mobile menu button*/}
@@ -58,36 +59,33 @@ export const UserPage: React.FC = () => {
                                     <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
                                         <div className="flex-shrink-0 flex items-center">
                                             <span className="block md:hidden h-8 w-auto text-white text-3xl ">Easy-Fishing</span>
-                                            <span className="hidden md:block h-8 w-auto text-white text-3xl ml-10">Easy-Fishing</span>
+                                            <span className="hidden md:block h-8 w-auto text-white text-3xl ml-20">Easy-Fishing</span>
                                         </div>
                                     </div>
-                                    <div className="hidden sm:block lg:ml-6">
-                                        <div className="flex sm:block lg:ml-6 flex-auto">
-                                            <div className="flex flex-auto justify-between space-x-4">
-                                                <div className="flex flex-wrap content-center justify-end">
-                                                    {navigation.map((item) => (
-                                                        <Link
-                                                            key={item.name}
-                                                            to={item.to}
-                                                            onClick={() => {
-                                                                if (item.name === 'Add a location') {
-                                                                    addLocation();
-                                                                }
-                                                                if (item.name === 'Sign out') {
-                                                                    singOut();
-                                                                }
-                                                            }}
-                                                            className={classNames(
-                                                                item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                                                                'px-3 py-2 rounded-md text-sm font-medium'
-                                                            )}
-                                                            aria-current={item.current ? 'page' : undefined}
-                                                        >
-                                                            {item.name}
-                                                        </Link>
-                                                    ))}
-                                                </div>
-                                            </div>
+                                    <div className="flex-2 hidden sm:block sm:ml-6">
+                                        <div className="flex flex-wrap content-center justify-end">
+                                            <SelectMenu />
+                                            {navigation.map((item) => (
+                                                <Link
+                                                    key={item.name}
+                                                    to={item.to}
+                                                    onClick={() => {
+                                                        if (item.name === 'Add a location') {
+                                                            addLocation();
+                                                        }
+                                                        if (item.name === 'Sign out') {
+                                                            singOut();
+                                                        }
+                                                    }}
+                                                    className={classNames(
+                                                        item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                                                        'px-3 py-2 rounded-md text-sm font-medium'
+                                                    )}
+                                                    aria-current={item.current ? 'page' : undefined}
+                                                >
+                                                    {item.name}
+                                                </Link>
+                                            ))}
                                         </div>
                                     </div>
                                 </div>
@@ -96,6 +94,7 @@ export const UserPage: React.FC = () => {
 
                         <Disclosure.Panel className="sm:hidden">
                             <div className="px-2 pt-2 pb-3 space-y-1">
+                                <SelectMenu />
                                 {navigation.map((item) => (
                                     <Link
                                         key={item.name}

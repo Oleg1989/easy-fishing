@@ -33,7 +33,7 @@ export const Search = (props:
     });
 
     return (
-        <div className="flex justify-center items-center w-94 z-10 absolute top-32 left-3 shadow" title="Search">
+        <div className="flex justify-center items-center w-94 z-10 absolute top-32 right-3 shadow" title="Search">
             <div className="relative w-full">
                 <Combobox onSelect={async (address) => {
                     setValue(address, false);

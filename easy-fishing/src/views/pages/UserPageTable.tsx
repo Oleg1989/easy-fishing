@@ -13,7 +13,8 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import React, { useEffect, useState } from 'react';
 import { Location } from '../interface/InterfaceLocation';
 import { FormUpdateLocation } from '../components/forms/FormUpdateLocation';
-import { deleteLocathinDatabase, getUserFromDatabase } from '../containerAPI';
+import { getUserFromDatabase } from '../containerAPI';
+import { Delete } from '../components/delete/Delete';
 
 
 const navigation = [
@@ -31,6 +32,8 @@ export const UserPageTable: React.FC = () => {
     const user = useAppSelector(selectUser);
 
     const [updateLocationUser, setUpdateLocationUser] = useState<Location>();
+    const [showDelete, setShowDelete] = useState<boolean>(false);
+    const [locationId, setLocationId] = useState<string>('');
 
     const error = (message: string) => {
         dispatch(isMessage(message));
@@ -41,10 +44,6 @@ export const UserPageTable: React.FC = () => {
 
     for (let key in userLocations) {
         locations.push(userLocations[key]);
-    }
-
-    const deleteLocation = (id: string) => {
-        dispatch(deleteLocathinDatabase({ userId: uId!, locationId: id, error: error }));
     }
 
     const updateLocation = (id: string) => {
@@ -64,6 +63,10 @@ export const UserPageTable: React.FC = () => {
                 updateLocationUser={updateLocationUser!}
                 setUpdateLocationUser={setUpdateLocationUser}
             />
+            {showDelete ? <Delete
+                setShowDelete={setShowDelete}
+                locationId={locationId}
+            /> : null}
             <Disclosure as="nav" className="bg-gray-800">
                 {({ open }) => (
                     <>
@@ -200,7 +203,8 @@ export const UserPageTable: React.FC = () => {
                                                     <button
                                                         className="text-red-600 hover:text-red-900 m-5"
                                                         onClick={(event) => {
-                                                            deleteLocation((event.target as HTMLElement).parentElement?.parentElement?.id!);
+                                                            setShowDelete(true);
+                                                            setLocationId((event.target as HTMLElement).parentElement?.parentElement?.id!);
                                                         }}
                                                     >
                                                         Delete

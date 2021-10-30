@@ -21,20 +21,20 @@ export const FormUpdateLocation = (
             {modal ? (
                 <>
                     <div
-                        className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none m-5"
+                        className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none"
                     >
-                        <div className="relative w-full my-6 mx-auto max-w-3xl">
+                        <div className="relative w-full my-6 mx-auto max-w-lg opacity-80">
                             {/*content*/}
                             <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
                                 {/*header*/}
-                                <div className="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
-                                    <h3 className="text-3xl font-semibold">
+                                <div className="flex items-start justify-center p-2 border-b border-solid border-blueGray-200">
+                                    <h3 className="text-3xl font-semibold text-blue-900">
                                         Update location
                                     </h3>
                                 </div>
                                 {/*body*/}
-                                <div className="relative p-6 flex-auto">
-                                    <div className="w-full py-5">
+                                <div className="relative p-2 flex-auto">
+                                    <div className="w-full py-2">
                                         <label htmlFor="street-address" className="block text-sm font-medium text-gray-700">
                                             Title
                                         </label>
@@ -51,7 +51,7 @@ export const FormUpdateLocation = (
                                             className="mt-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                                         />
                                     </div>
-                                    <div className="w-full py-5">
+                                    <div className="w-full py-2">
                                         <label htmlFor="about" className="block text-sm font-medium text-gray-700">
                                             Description
                                         </label>
@@ -74,7 +74,7 @@ export const FormUpdateLocation = (
                                             A brief description of your event.
                                         </p>
                                     </div>
-                                    <div className="w-full py-5">
+                                    <div className="w-full py-2">
                                         <label htmlFor="about" className="block text-sm font-medium text-gray-700">
                                             Public location?
                                         </label>
@@ -91,7 +91,7 @@ export const FormUpdateLocation = (
                                             className="mt-2 block shadow-sm sm:text-sm border-gray-400"
                                         />
                                     </div>
-                                    <div className="w-full py-5">
+                                    <div className="w-full py-2">
                                         <label htmlFor="about" className="block text-sm font-medium text-gray-700">
                                             Date
                                         </label>
@@ -112,7 +112,7 @@ export const FormUpdateLocation = (
                                     </div>
                                 </div>
                                 {/*footer*/}
-                                <div className="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b">
+                                <div className="flex items-center justify-end p-2 border-t border-solid border-blueGray-200 rounded-b">
                                     <button
                                         className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                                         type="button"
@@ -123,7 +123,7 @@ export const FormUpdateLocation = (
                                         Close
                                     </button>
                                     <button
-                                        className="bg-green-600 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                                        className="bg-green-600 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 opacity-80"
                                         type="button"
                                         onClick={() => {
                                             dispatch(closeModal());

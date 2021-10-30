@@ -11,8 +11,6 @@ import {
     selectUId,
     selectIsAuthenticated,
     showModal,
-    isMessage,
-    isError,
     selectMapStyle
 } from '../../containerSlice';
 import cuid from 'cuid';
@@ -21,8 +19,9 @@ import { FormAddLocation } from '../forms/FormAddLocation';
 import { NewLocationMap } from '../../interface/InterfaceNewLocationMap';
 import { Coordinates } from '../../interface/InterfaceCoordinates';
 import { FormUpdateLocation } from '../forms/FormUpdateLocation';
-import { addLocathinDatabase, deleteLocathinDatabase } from '../../containerAPI';
+import { addLocathinDatabase } from '../../containerAPI';
 import "@reach/combobox/styles.css";
+import { Delete } from '../delete/Delete';
 
 //Google map settings
 const containerStyle = {
@@ -66,11 +65,8 @@ export const Map: React.FC = () => {
     const [newLocation, setNewLocation] = useState<NewLocationMap | null>(null);
     const [updateLocationUser, setUpdateLocationUser] = useState<Location>();
     const [search, setSearch] = useState<boolean>(false);
-
-    const error = (message: string) => {
-        dispatch(isMessage(message));
-        dispatch(isError());
-    }
+    const [showDelete, setShowDelete] = useState<boolean>(false);
+    const [locationId, setLocationId] = useState<string>('');
 
     let locations: Location[] = [];
     for (let key in userLocations) {
@@ -91,9 +87,6 @@ export const Map: React.FC = () => {
         mapRef.current?.setZoom(15);
     }, []);
 
-    const deleteLocation = (id: string) => {
-        dispatch(deleteLocathinDatabase({ userId: uId!, locationId: id, error: error }));
-    }
     const updateLocation = (id: string) => {
         dispatch(showModal())
         const location = locations.find((loc) => loc.id === id);
@@ -178,6 +171,10 @@ export const Map: React.FC = () => {
                 updateLocationUser={updateLocationUser!}
                 setUpdateLocationUser={setUpdateLocationUser}
             />
+            {showDelete ? <Delete
+                setShowDelete={setShowDelete}
+                locationId={locationId}
+            /> : null}
 
             <GoogleMap
                 mapContainerStyle={containerStyle}
@@ -221,21 +218,24 @@ export const Map: React.FC = () => {
                     }
                     }
                 >
-                    <div id={selected.id} className=" relative w-full bg-white rounded shadow-lg transitionOpacity transitionTransform duration-300 z-20">
-                        <div className="px-4 py-3 border-b border-gray-200">
-                            <h2 className="text-xl font-semibold text-gray-600">{selected.title}</h2>
+                    <div id={selected.id} className="relative max-w-xs rounded-md shadow-lg z-20 break-words">
+                        <div className="px-4 py-3 border-b border-gray-300">
+                            <h2 className="text-xl font-semibold text-gray-600">Name</h2>
                         </div>
-                        <div className="w-full p-3">
-                            <p><b>Description:</b> {selected.description}</p>
+                        <div className="p-3">
+                            <p><b className="mr-2">Title:</b>{selected.title}</p>
                         </div>
-                        <div className="border-gray-200 w-full p-3">
-                            <p><b>Date:</b> {selected.date}</p>
+                        <div className="p-3">
+                            <p><b className="mr-2">Description:</b>{selected.description}</p>
                         </div>
-                        <div className="border-gray-200 w-full p-3">
+                        <div className="p-3">
+                            <p><b className="mr-2">Date:</b>{selected.date}</p>
+                        </div>
+                        <div className="p-3">
                             <p>
-                                <b>Status:</b> {selected.publicLocation === true ? 'Publicly' : 'Private'}</p>
+                                <b className="mr-2">Status:</b>{selected.publicLocation === true ? 'Publicly' : 'Private'}</p>
                         </div>
-                        <div>
+                        <div className="flex justify-between">
                             {isAuthenticated ? <>
                                 <button
                                     className="text-indigo-600 hover:text-indigo-900 m-3"
@@ -249,7 +249,8 @@ export const Map: React.FC = () => {
                                 <button
                                     className="text-red-600 hover:text-red-900 m-3"
                                     onClick={(event) => {
-                                        deleteLocation((event.target as HTMLElement).parentElement?.parentElement?.id!);
+                                        setShowDelete(true);
+                                        setLocationId((event.target as HTMLElement).parentElement?.parentElement?.id!);
                                         setSelected(null);
                                     }}
                                 >

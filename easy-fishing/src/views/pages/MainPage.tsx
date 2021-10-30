@@ -33,7 +33,7 @@ export const MainPage: React.FC = () => {
             <Disclosure as="nav" className="bg-gray-800">
                 {({ open }) => (
                     <>
-                        <div className="max-w-7xl mx-auto">
+                        <div className="max-w-full mx-auto">
                             <div className="relative flex items-center justify-between h-16">
                                 <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
                                     {/* Mobile menu button*/}
@@ -49,11 +49,11 @@ export const MainPage: React.FC = () => {
                                 <div className="flex flex-1 items-center justify-between">
                                     <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
                                         <div className="flex-shrink-0 flex items-center">
-                                            <span className="block md:hidden h-8 w-auto text-white text-3xl ">Easy-Fishing</span>
+                                            <span className="block md:hidden h-8 w-auto text-white text-3xl ml-20">Easy-Fishing</span>
                                             <span className="hidden md:block h-8 w-auto text-white text-3xl ml-20">Easy-Fishing</span>
                                         </div>
                                     </div>
-                                    <div className="flex-1 hidden sm:block sm:ml-6">
+                                    <div className="flex-2 hidden sm:block sm:ml-6">
                                         <div className="flex flex-wrap content-center justify-end">
                                             <SelectMenu />
                                             {navigation.map((item) => (
