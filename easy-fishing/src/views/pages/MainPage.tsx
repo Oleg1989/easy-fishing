@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from "react-router-dom";
 import { Disclosure } from '@headlessui/react';
 import { MenuIcon, XIcon } from '@heroicons/react/outline';
@@ -7,10 +7,12 @@ import { isError, isMessage } from '../containerSlice';
 import { useAppDispatch } from '../../app/hooks';
 import { getPublicLocations } from '../containerAPI';
 import { SelectMenu } from '../components/map/SelectMenu';
+import { Login } from '../components/forms/Login';
+import { Registration } from '../components/forms/Registration';
 
 const navigation = [
-    { name: 'Sign in', to: '/login', current: false },
-    { name: 'Sign up', to: '/registration', current: false },
+    { name: 'Sign in', to: '#', current: false },
+    { name: 'Sign up', to: '#', current: false },
 ]
 
 function classNames(...classes: string[]) {
@@ -19,6 +21,9 @@ function classNames(...classes: string[]) {
 
 export const MainPage: React.FC = () => {
     const dispatch = useAppDispatch();
+
+    const [isLogin, setIsLogin] = useState<boolean>(false);
+    const [isRegistration, setIsRegistration] = useState<boolean>(false);
 
     const error = (message: string) => {
         dispatch(isMessage(message));
@@ -30,6 +35,8 @@ export const MainPage: React.FC = () => {
     });
     return (
         <>
+            {isLogin ? <Login setIsLogin={setIsLogin} /> : null}
+            {isRegistration ? <Registration setIsRegistration={setIsRegistration} /> : null}
             <Disclosure as="nav" className="bg-gray-800">
                 {({ open }) => (
                     <>
@@ -60,6 +67,14 @@ export const MainPage: React.FC = () => {
                                                 <Link
                                                     key={item.name}
                                                     to={item.to}
+                                                    onClick={() => {
+                                                        if (item.name === 'Sign in') {
+                                                            setIsLogin(true);
+                                                        }
+                                                        if (item.name === 'Sign up') {
+                                                            setIsRegistration(true);
+                                                        }
+                                                    }}
                                                     className={classNames(
                                                         item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                                                         'px-3 py-2 rounded-md text-sm font-medium'
@@ -82,6 +97,14 @@ export const MainPage: React.FC = () => {
                                     <Link
                                         key={item.name}
                                         to={item.to}
+                                        onClick={() => {
+                                            if (item.name === 'Sign in') {
+                                                setIsLogin(true);
+                                            }
+                                            if (item.name === 'Sign up') {
+                                                setIsRegistration(true);
+                                            }
+                                        }}
                                         className={classNames(
                                             item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                                             'block px-3 py-2 rounded-md text-base font-medium'
